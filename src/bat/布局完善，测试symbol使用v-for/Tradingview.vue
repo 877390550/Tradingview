@@ -1,5 +1,5 @@
 <script setup>
-import {onUpdated,toRaw,onBeforeMount,} from 'vue'
+import {onUpdated,toRaw,onBeforeMount,watch} from 'vue'
 // 由于tradingview的插件需要指定图表插入的div的id,而id是唯一的，想要复用该组件就必须使用props接收从父组件传过来的div的id
 const props = defineProps(['id','locale','hide_top_toolbar','hidevolume','theme','interval','timezone','hide_side_toolbar','list',])
 const rawHtml="<div class='compcontainer' id='tradingview_"+props.id+"' ></div>"//利用v-html在组件中生成对应id的div
@@ -19,6 +19,7 @@ const Widget=()=>{
 }
 onBeforeMount(() => {
   console.log('onBeforeMount')
+  console.log(toRaw(props))
 
   setTimeout(() => {
     Widget()

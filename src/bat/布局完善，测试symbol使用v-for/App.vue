@@ -1,6 +1,7 @@
 <script setup>
-import { ref } from 'vue'
+import { ref} from 'vue'
 import {
+  Minus,
   Menu as IconMenu,
   Grid,
 } from '@element-plus/icons-vue'
@@ -20,125 +21,51 @@ const handleSwitch = (val) => {
 //品种列表
 const tableData = [
   {
+    sid: 1,
     symbol: 'BTCUSDT.P',
     source: 'OKX',
   },
   {
+    sid: 2,
     symbol: 'ETHUSDT.P',
     source: 'OKX',
   },
   {
+    sid: 3,
     symbol: 'ENSUSDT.P',
     source: 'OKX',
   },
   {
+    sid: 4,
     symbol: 'FILUSDT.P',
     source: 'OKX',
   },
   {
+    sid: 5,
     symbol: 'UNIUSDT.P',
     source: 'OKX',
   },
   {
+    sid: 6,
     symbol: 'MATICUSDT.P',
     source: 'OKX',
   },
   {
+    sid: 7,
     symbol: 'APEUSDT.P',
     source: 'OKX',
   },
   {
+    sid: 8,
     symbol: 'AAVEUSDT.P',
     source: 'OKX',
   },
   {
+    sid: 9,
     symbol: 'SOLUSDT.P',
     source: 'OKX',
   },
-  {
-    symbol: 'LTCUSDT.P',
-    source: 'OKX',
-  },
-  {
-    symbol: 'ZILUSDT.P',
-    source: 'OKX',
-  },
-  {
-    symbol: 'FTMUSDT.P',
-    source: 'OKX',
-  },
-  {
-    symbol: 'PEOPLEUSDT.P',
-    source: 'OKX',
-  },
-  {
-    symbol: 'GALAUSDT.P',
-    source: 'OKX',
-  },
-  {
-    symbol: 'GMTUSDT.P',
-    source: 'OKX',
-  },
-  {
-    symbol: 'ATOMUSDT.P',
-    source: 'OKX',
-  },
-  {
-    symbol: 'MANAUSDT.P',
-    source: 'OKX',
-  },
-  {
-    symbol: 'SANDUSDT.P',
-    source: 'OKX',
-  },
-  {
-    symbol: 'ETCUSDT.P',
-    source: 'OKX',
-  },
-  {
-    symbol: '1INCHUSDT.P',
-    source: 'OKX',
-  },
-  {
-    symbol: 'ALGOUSDT.P',
-    source: 'OKX',
-  },
-  {
-    symbol: 'CHZUSDT.P',
-    source: 'OKX',
-  },
-  {
-    symbol: 'OPUSDT.P',
-    source: 'OKX',
-  },
-  {
-    symbol: 'LINKUSDT.P',
-    source: 'OKX',
-  },
 ]
-console.log(tableData)
-let testlist = []
-for (let i = 0; i < tableData.length / 3; i++) {
-  testlist[i] = {
-    row: i,
-    symbolist: [{
-      id: i * 3,
-      ...tableData[i * 3],
-    },
-    {
-      id: i * 3 + 1,
-      ...tableData[i * 3 + 1],
-    },
-    {
-      id: i * 3 + 2,
-      ...tableData[i * 3 + 2],
-    },
-    ]
-  }
-}
-//分页和操作
-let currentPage = ref(1)
-
 let configVisible = ref(false)
 let config = ref({ //config的数据仅在dialog中修改,不传输到子组件
   list: tableData,
@@ -150,7 +77,7 @@ let config = ref({ //config的数据仅在dialog中修改,不传输到子组件
   interval: "5",//时间周期,1为1min
   timezone: "Asia/Shanghai",//时区
 })
-let post = { ...config.value } 
+let post = { ...config.value } //传递的参数不应该响应式，否则不按确认就马上触发onUpdated
 const handleConfig = () => {
   configVisible.value = true
 }
@@ -162,27 +89,27 @@ const handleSubmit = () => {
 // --------test-----------
 const test = () => {
 }
-
 // --------test-----------
 
 </script>
 
 <template>
-  <div class="container" @keyup.enter="onspacedown">
+  <div class="container">
     <!-- table -->
     <!-- 全局配置弹窗 -->
-    <el-dialog v-model="configVisible" title="初始化设置" @click="test">
+    <el-dialog v-model="configVisible" title="全局配置" @click="test">
       <!-- 品种列表 -->
-      <!-- <el-table :data="tableData" height="250">
+      <el-table :data="tableData" height="250">
         <el-table-column prop="symbol" label="商品代码" />
         <el-table-column prop="source" label="来源" />
         <el-table-column fixed="right" label="操作">
           <template #default>
-            <el-button link type="primary" size="small">移除</el-button>
+            <el-button link type="primary" size="small">修改</el-button>
+            <el-button link type="primary" size="small">删除</el-button>
             <el-button link type="primary" size="small">置顶</el-button>
           </template>
         </el-table-column>
-      </el-table> -->
+      </el-table>
       <!-- 品种列表 -->
       <!-- 下方选项区 -->
       <el-row :gutter="20">
@@ -314,9 +241,9 @@ const test = () => {
           <el-icon>
             <Grid />
           </el-icon>
-          <template #title>初始化</template>
+          <template #title>全局配置</template>
         </el-menu-item>
-        <!-- <el-menu-item index="1" @click="handleSwitch">
+        <el-menu-item index="1" @click="handleSwitch">
           <el-icon>
             <Minus />
           </el-icon>
@@ -327,17 +254,12 @@ const test = () => {
             <icon-menu />
           </el-icon>
           <template #title>四分</template>
-        </el-menu-item> -->
-        <!-- <el-menu-item index="3" @click="handleSwitch">
+        </el-menu-item>
+        <el-menu-item index="3" @click="handleSwitch">
           <el-icon>
             <Grid />
           </el-icon>
-          <template #title>浏览视图</template>
-        </el-menu-item> -->
-        <el-menu-item index="5">
-          <template #title >
-            <button @click="localtest">测试</button>
-          </template>
+          <template #title>九分</template>
         </el-menu-item>
       </el-menu>
     </div>
@@ -381,50 +303,66 @@ const test = () => {
     <!-- 原始布局 -->
     <!-- el布局 -->
     <!-- 默认模板监听el-row,只修改el-col是不会触发视图更新的 -->
-    <div class="layoutcontainer">
-      <el-row v-if="!configVisible" v-for="(value, index) in testlist" :key="index"
-        v-show="(currentPage - 1) === parseInt(value.row / 3)">
-        <el-col :span="8" v-for="(item, index) in value.symbolist" :key="index">
-          <Tradingview v-bind="post" :id=item.id />
-        </el-col>
-      </el-row>
-      <!-- 测试输入 -->
-      <!-- <input type="text" ref="inputbox" v-model="textvalue">
-      {{textvalue}} -->
-      <!-- 测试输入 -->
-    </div>
-    <el-pagination class="page" layout="prev, pager, next" :total="testlist.length" :page-size='3'
-         v-model:current-page="currentPage" />
+    <div class="layoutcontainer" > 
+    <el-row v-if="!configVisible">
+    <el-col :span="8" class="TVbox">
+      <Tradingview id='0' v-bind="post" />
+   </el-col>
+   <el-col :span="8" class="TVbox">
+      <Tradingview id='1' v-bind="post" />
+   </el-col>
+   <el-col :span="8" class="TVbox">
+      <Tradingview id='2' v-bind="post" />
+   </el-col>
+  </el-row>
+  <el-row v-if="!configVisible">
+    <el-col :span="8" class="TVbox">
+      <Tradingview id='3' v-bind="post" />
+   </el-col>
+   <el-col :span="8" class="TVbox">
+      <Tradingview id='4' v-bind="post" />
+   </el-col>
+   <el-col :span="8" class="TVbox">
+      <Tradingview id='5' v-bind="post" />
+   </el-col>
+  </el-row>
+  <el-row v-if="!configVisible">
+    <el-col :span="8" class="TVbox">
+      <Tradingview id='6' v-bind="post" />
+   </el-col>
+   <el-col :span="8" class="TVbox">
+      <Tradingview id='7' v-bind="post" />
+   </el-col>
+   <el-col :span="8" class="TVbox">
+      <Tradingview id='8' v-bind="post" />
+   </el-col>
+  </el-row>
+</div>
+    <!-- el布局 -->
   </div>
 </template>
 
 <style lang="less">
 .container {
-
+  // el布局
+.tablecontainer{
+  width: 100%;
+  height: 100%;
+}
   // el布局
 
-  .layoutcontainer {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-
-    .el-row {
-      flex: 1; //el-row是layoutcontainer容器中的子元素，该容器垂直排列，设置flex:1使其垂直方向铺满容器
-      margin-bottom: 0;
-
-      .grid-content {
-        height: 100%;
-      }
-    }
-
+  .layoutcontainer{
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  .el-row{
+    flex: 1;//el-row是layoutcontainer容器中的子元素，该容器垂直排列，设置flex:1使其垂直方向铺满容器
+    margin-bottom: 0;
+    .grid-content {
+      height: 100%;
+}
   }
-
-  .page {
-    position: absolute;
-    z-index: 999;
-    opacity: 0.3;
-    bottom: 0;
-    left: 0;
+  
   }
 
   .menu {
@@ -433,7 +371,7 @@ const test = () => {
     z-index: 999;
     opacity: 0.3;
     bottom: 0;
-    right: 0;
+    left: 0;
   }
 
   .el-menu-vertical-demo:not(.el-menu--collapse) {
@@ -447,8 +385,7 @@ const test = () => {
   height: 30px;
 }
 
-.el-row {
-  //dialog配置中的elrow
+.el-row {//dialog配置中的elrow
   margin-bottom: 20px;
 }
 
