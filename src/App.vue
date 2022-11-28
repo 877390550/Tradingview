@@ -115,27 +115,49 @@ const tableData = [
     symbol: 'LINKUSDT.P',
     source: 'OKX',
   },
+  {
+    symbol: 'MASKUSDT.P',
+    source: 'OKX',
+  },
 ]
-console.log(tableData)
-let testlist = []
-for (let i = 0; i < tableData.length / 3; i++) {
-  testlist[i] = {
-    row: i,
-    symbolist: [{
-      id: i * 3,
-      ...tableData[i * 3],
-    },
-    {
-      id: i * 3 + 1,
-      ...tableData[i * 3 + 1],
-    },
-    {
-      id: i * 3 + 2,
-      ...tableData[i * 3 + 2],
-    },
-    ]
+// for (let i = 0; i < tableData.length / 3; i++) {//长度除以多少，表示每行有多少个数据
+//   testlist[i] = {
+//     row: i,
+//     symbolist: [{
+//       id: i * 3,
+//       ...tableData[i * 3],
+//     },
+//     {
+//       id: i * 3 + 1,
+//       ...tableData[i * 3 + 1],
+//     },
+//     {
+//       id: i * 3 + 2,
+//       ...tableData[i * 3 + 2],
+//     },
+//     ]
+//   }
+// }
+
+const init=(list,n)=>{//原始数据，每行显示多少个数据
+  let inited=[]
+  for (let i=0;i<list.length/n;i++){
+    inited[i]={
+      row:i,
+      symbolist:[]
+    }
+    for(let j=0;j<n;j++){
+      inited[i]['symbolist'][j]={
+        id:i*n+j,
+        ...list[i*n+j]
+      }
+    }
   }
+  return inited
 }
+let amountpage=ref(2);
+let amountrow=ref(3);
+const testlist=init(tableData,amountrow.value)
 //分页和操作
 let currentPage = ref(1)
 
@@ -153,10 +175,14 @@ let config = ref({ //config的数据仅在dialog中修改,不传输到子组件
 let post = { ...config.value } 
 const handleConfig = () => {
   configVisible.value = true
+  console.log('amountpage为'+amountpage.value)
+  console.log('amountrow为'+amountrow.value)
 }
 const handleSubmit = () => {
   post = ref({ ...config.value })
   configVisible.value = false
+  console.log('amountpage为'+amountpage.value)
+  console.log('amountrow为'+amountrow.value)
 }
 // -----全局配置---------
 // --------test-----------
@@ -286,10 +312,12 @@ const test = () => {
       <el-row :gutter="20">
         <el-col :span="8">
           <div class="grid-content ep-bg-purple-light">
+            <!-- <el-input v-model="amountrow" placeholder="每行数据量" /> -->
           </div>
         </el-col>
         <el-col :span="8">
           <div class="grid-content ep-bg-purple-light">
+            <!-- <el-input v-model="amountpage" placeholder="每页行数" /> -->
           </div>
         </el-col>
         <el-col :span="8">
@@ -382,8 +410,9 @@ const test = () => {
     <!-- el布局 -->
     <!-- 默认模板监听el-row,只修改el-col是不会触发视图更新的 -->
     <div class="layoutcontainer">
+      <!-- <p>total:{{testlist.length}} amountpage:{{amountpage}} currentpage:{{currentPage}}</p> -->
       <el-row v-if="!configVisible" v-for="(value, index) in testlist" :key="index"
-        v-show="(currentPage - 1) === parseInt(value.row / 3)">
+        v-show="(currentPage - 1) === parseInt(value.row / amountpage)">
         <el-col :span="8" v-for="(item, index) in value.symbolist" :key="index">
           <Tradingview v-bind="post" :id=item.id />
         </el-col>
@@ -393,9 +422,10 @@ const test = () => {
       {{textvalue}} -->
       <!-- 测试输入 -->
     </div>
-    <el-pagination class="page" layout="prev, pager, next" :total="testlist.length" :page-size='3'
+    <el-pagination class="page" layout="prev, pager, next" :total="testlist.length" v-model:page-size='amountpage'
          v-model:current-page="currentPage" />
   </div>
+
 </template>
 
 <style lang="less">
@@ -424,7 +454,8 @@ const test = () => {
     z-index: 999;
     opacity: 0.3;
     bottom: 0;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   .menu {
@@ -466,6 +497,9 @@ const test = () => {
 }
 
 
+body{
+  background-color: rgb(20, 24, 35);
+}
 * {
   margin: 0;
   padding: 0;
