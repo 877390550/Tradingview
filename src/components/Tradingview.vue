@@ -12,7 +12,7 @@ const Widget=()=>{
     "container_id": 'tradingview_'+props.id,
     "style": "1",//价格展示方式，1为K线图
     // 全局配置,应统一监听使界面更新
-    "symbol": `${symbollist[props.id].source}:${symbollist[props.id].symbol}`,
+    "symbol": `${symbollist[props.id]['source']}:${symbollist[props.id]['symbol']}`,
     ...toRaw(props),
   }
     );
@@ -51,5 +51,6 @@ const handleclick=()=>{
 .outside{
   width: 100%;
   height: 100%;
+
 }
 </style>

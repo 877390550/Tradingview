@@ -120,24 +120,6 @@ const tableData = [
     source: 'OKX',
   },
 ]
-// for (let i = 0; i < tableData.length / 3; i++) {//长度除以多少，表示每行有多少个数据
-//   testlist[i] = {
-//     row: i,
-//     symbolist: [{
-//       id: i * 3,
-//       ...tableData[i * 3],
-//     },
-//     {
-//       id: i * 3 + 1,
-//       ...tableData[i * 3 + 1],
-//     },
-//     {
-//       id: i * 3 + 2,
-//       ...tableData[i * 3 + 2],
-//     },
-//     ]
-//   }
-// }
 
 const init=(list,n)=>{//原始数据，每行显示多少个数据
   let inited=[]
@@ -155,11 +137,18 @@ const init=(list,n)=>{//原始数据，每行显示多少个数据
   }
   return inited
 }
-let amountpage=ref(2);
-let amountrow=ref(3);
-const testlist=init(tableData,amountrow.value)
-//分页和操作
+let amountpage=ref(3);//每页显示行数
+let amountrow=ref(3);//每行显示个数
+let testlist=init(tableData,amountrow.value)
 let currentPage = ref(1)
+const totalPage=Math.ceil(tableData.length/amountpage.value/amountrow.value)
+const nextpage=()=>{
+  if(currentPage.value===totalPage){
+    currentPage.value=1
+  }else{
+    currentPage.value++
+  }
+}
 
 let configVisible = ref(false)
 let config = ref({ //config的数据仅在dialog中修改,不传输到子组件
@@ -175,19 +164,28 @@ let config = ref({ //config的数据仅在dialog中修改,不传输到子组件
 let post = { ...config.value } 
 const handleConfig = () => {
   configVisible.value = true
-  console.log('amountpage为'+amountpage.value)
-  console.log('amountrow为'+amountrow.value)
+}
+//自动切换
+let AutoMode=ref('off')
+let auto=0;
+let autogap=ref(1)
+const handleAuto=()=>{
+if(AutoMode.value==='on'){
+  console.log('关闭自动')
+  AutoMode.value='off'
+  clearInterval(auto)
+}else{
+  console.log('开启自动')
+  AutoMode.value='on'
+  auto=setInterval(nextpage,autogap.value*60000)
+}
 }
 const handleSubmit = () => {
   post = ref({ ...config.value })
   configVisible.value = false
-  console.log('amountpage为'+amountpage.value)
-  console.log('amountrow为'+amountrow.value)
 }
 // -----全局配置---------
 // --------test-----------
-const test = () => {
-}
 
 // --------test-----------
 
@@ -197,7 +195,7 @@ const test = () => {
   <div class="container" @keyup.enter="onspacedown">
     <!-- table -->
     <!-- 全局配置弹窗 -->
-    <el-dialog v-model="configVisible" title="初始化设置" @click="test">
+    <el-dialog v-model="configVisible" title="初始化设置" style="transform: scale(2);">
       <!-- 品种列表 -->
       <!-- <el-table :data="tableData" height="250">
         <el-table-column prop="symbol" label="商品代码" />
@@ -211,19 +209,7 @@ const test = () => {
       </el-table> -->
       <!-- 品种列表 -->
       <!-- 下方选项区 -->
-      <el-row :gutter="20">
-        <el-col :span="8">
-          <div class="grid-content ep-bg-purple-light">
-          </div>
-        </el-col>
-        <el-col :span="8">
-          <div class="grid-content ep-bg-purple-light">
-          </div>
-        </el-col>
-        <el-col :span="8">
-          <div class="grid-content ep-bg-purple"></div>
-        </el-col>
-      </el-row>
+      <br>
       <el-row :gutter="20">
         <el-col :span="8">
           <el-form class="grid-content ep-bg-purple">
@@ -312,12 +298,10 @@ const test = () => {
       <el-row :gutter="20">
         <el-col :span="8">
           <div class="grid-content ep-bg-purple-light">
-            <!-- <el-input v-model="amountrow" placeholder="每行数据量" /> -->
           </div>
         </el-col>
         <el-col :span="8">
           <div class="grid-content ep-bg-purple-light">
-            <!-- <el-input v-model="amountpage" placeholder="每页行数" /> -->
           </div>
         </el-col>
         <el-col :span="8">
@@ -336,13 +320,19 @@ const test = () => {
     </el-dialog>
     <!-- 全局配置弹窗 -->
     <!-- 导航 -->
-    <div class="menu">
+    <div class="menu" >
       <el-menu default-active="4" class="el-menu-vertical-demo" collapse mode='horizontal'>
-        <el-menu-item @click="handleConfig">
+        <el-menu-item @click="handleConfig" style="font-size:2em ;">
           <el-icon>
             <Grid />
           </el-icon>
           <template #title>初始化</template>
+        </el-menu-item>
+        <el-menu-item @click="handleAuto" style="font-size:2em ;">
+          <el-icon>
+            <Grid />
+          </el-icon>
+          <template #title>自动&nbsp;&nbsp;&nbsp;&nbsp;{{AutoMode}}</template>
         </el-menu-item>
         <!-- <el-menu-item index="1" @click="handleSwitch">
           <el-icon>
@@ -362,11 +352,6 @@ const test = () => {
           </el-icon>
           <template #title>浏览视图</template>
         </el-menu-item> -->
-        <el-menu-item index="5">
-          <template #title >
-            <button @click="localtest">测试</button>
-          </template>
-        </el-menu-item>
       </el-menu>
     </div>
     <!-- 导航 -->
@@ -410,21 +395,22 @@ const test = () => {
     <!-- el布局 -->
     <!-- 默认模板监听el-row,只修改el-col是不会触发视图更新的 -->
     <div class="layoutcontainer">
-      <!-- <p>total:{{testlist.length}} amountpage:{{amountpage}} currentpage:{{currentPage}}</p> -->
       <el-row v-if="!configVisible" v-for="(value, index) in testlist" :key="index"
         v-show="(currentPage - 1) === parseInt(value.row / amountpage)">
         <el-col :span="8" v-for="(item, index) in value.symbolist" :key="index">
           <Tradingview v-bind="post" :id=item.id />
         </el-col>
       </el-row>
-      <!-- 测试输入 -->
-      <!-- <input type="text" ref="inputbox" v-model="textvalue">
-      {{textvalue}} -->
-      <!-- 测试输入 -->
     </div>
-    <el-pagination class="page" layout="prev, pager, next" :total="testlist.length" v-model:page-size='amountpage'
-         v-model:current-page="currentPage" />
+    <div class="page">
+    <el-pagination
+      v-model:current-page="currentPage"
+      v-model:page-size="amountpage"
+      layout="prev, pager, next"
+      :total="testlist.length"
+    />
   </div>
+    </div>
 
 </template>
 
@@ -452,19 +438,27 @@ const test = () => {
   .page {
     position: absolute;
     z-index: 999;
-    opacity: 0.3;
+    opacity: 0;
     bottom: 0;
     left: 50%;
-    transform: translateX(-50%);
+    transform: scale(2) translateX(-25%) translateY(-50%);//重要知识点，当元素放大两倍，又要使用left和translatex使元素居中时，translatex应该偏移25%而非50%，原因暂时未想明白
+  }
+  .page:hover{
+    opacity: 0.3;
   }
 
   .menu {
     width: 50px;
     position: absolute;
     z-index: 999;
-    opacity: 0.3;
+    opacity: 0;
     bottom: 0;
     right: 0;
+    transform: scale(2) translateX(-25%);
+  }
+
+  .menu:hover{
+    opacity: 0.3;
   }
 
   .el-menu-vertical-demo:not(.el-menu--collapse) {
@@ -476,6 +470,7 @@ const test = () => {
 .el-menu--collapse {
   width: calc(var(--el-mDenu-icon-width) + var(--el-menu-base-level-padding) * 3);
   height: 30px;
+  font-size: 30px;
 }
 
 .el-row {
