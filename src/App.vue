@@ -119,6 +119,22 @@ const tableData = [
     symbol: 'MASKUSDT.P',
     source: 'OKX',
   },
+  {
+    symbol: 'DOTUSDT.P',
+    source: 'OKX',
+  },
+  {
+    symbol: 'DOGEUSDT.P',
+    source: 'OKX',
+  },
+  {
+    symbol: 'ADAUSDT.P',
+    source: 'OKX',
+  },
+  {
+    symbol: 'XRPUSDT.P',
+    source: 'OKX',
+  },
 ]
 
 const init=(list,n)=>{//原始数据，每行显示多少个数据
@@ -427,7 +443,6 @@ const handleSubmit = () => {
     .el-row {
       flex: 1; //el-row是layoutcontainer容器中的子元素，该容器垂直排列，设置flex:1使其垂直方向铺满容器
       margin-bottom: 0;
-
       .grid-content {
         height: 100%;
       }
